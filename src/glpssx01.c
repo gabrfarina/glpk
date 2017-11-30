@@ -463,7 +463,7 @@ void ssx_chuzc(SSX *ssx)
       mpq_t *cbar = ssx->cbar;
       int j, k, s, q, q_dir;
       /* nothing is chosen so far */
-      q = 0, q_dir = 0, best = 0.0;
+      q = 0, q_dir = 0;
       /* look through the list of non-basic variables */
       for (j = 1; j <= n; j++)
       {  k = Q_col[m+j]; /* x[k] = xN[j] */
