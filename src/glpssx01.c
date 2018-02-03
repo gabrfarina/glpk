@@ -472,7 +472,7 @@ void ssx_chuzc(SSX *ssx)
              (stat[k] == SSX_NF || stat[k] == SSX_NU) && s > 0)
          {  /* reduced cost of xN[j] indicates possible improving of
                the objective function */
-            if (q == 0 || cbar[q] < cbar[j])
+            if (q == 0 || mpq_cmp(cbar[q], cbar[j]) < 0)
                q = j, q_dir = - s;
          }
       }
