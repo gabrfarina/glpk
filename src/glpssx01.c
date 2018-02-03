@@ -462,6 +462,7 @@ void ssx_chuzc(SSX *ssx)
       int *stat = ssx->stat;
       mpq_t *cbar = ssx->cbar;
       int j, k, s, q, q_dir;
+      double best, temp;
       /* nothing is chosen so far */
       q = 0, q_dir = 0;
       /* look through the list of non-basic variables */
@@ -472,8 +473,14 @@ void ssx_chuzc(SSX *ssx)
              (stat[k] == SSX_NF || stat[k] == SSX_NU) && s > 0)
          {  /* reduced cost of xN[j] indicates possible improving of
                the objective function */
-            if (q == 0 || mpq_cmp(cbar[q], cbar[j]) < 0)
-               q = j, q_dir = - s;
+            temp = fabs(mpq_get_d(cbar[j]));
+            if (temp == 0.0 || (q > 0 && best == 0.0)) {
+              if (q == 0 || mpq_cmp(cbar[q], cbar[j]) < 0)
+                 q = j, q_dir = - s, best = temp;
+            } else {
+               if (q == 0 || best < temp)
+                 q = j, q_dir = - s, best = temp;
+            }
          }
       }
       ssx->q = q, ssx->q_dir = q_dir;
