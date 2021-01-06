@@ -847,41 +847,38 @@ int lux_decomp(LUX *lux, int (*col)(void *info, int j, int ind[],
 *  matrix F. On exit this array will contain elements of the solution
 *  vector x in the same locations. */
 
-void lux_f_solve(LUX *lux, int tr, mpq_t x[])
-{     int n = lux->n;
-      LUXELM **F_row = lux->F_row;
-      LUXELM **F_col = lux->F_col;
-      int *P_row = lux->P_row;
-      LUXELM *fik, *fkj;
-      int i, j, k;
-      mpq_t temp;
-      mpq_init(temp);
-      if (!tr)
-      {  /* solve the system F*x = b */
-         for (j = 1; j <= n; j++)
-         {  k = P_row[j];
-            if (mpq_sgn(x[k]) != 0)
-            {  for (fik = F_col[k]; fik != NULL; fik = fik->c_next)
-               {  mpq_mul(temp, fik->val, x[k]);
-                  mpq_sub(x[fik->i], x[fik->i], temp);
-               }
-            }
-         }
+void lux_f_solve(const LUX *lux, int tr, mpq_t x[]) {
+  int n = lux->n;
+  LUXELM **F_row = lux->F_row;
+  LUXELM **F_col = lux->F_col;
+  int *P_row = lux->P_row;
+  LUXELM *fik, *fkj;
+  int i, j, k;
+  mpq_t temp;
+  mpq_init(temp);
+  if (!tr) { /* solve the system F*x = b */
+    for (j = 1; j <= n; j++) {
+      k = P_row[j];
+      if (mpq_sgn(x[k]) != 0) {
+        for (fik = F_col[k]; fik != NULL; fik = fik->c_next) {
+          mpq_mul(temp, fik->val, x[k]);
+          mpq_sub(x[fik->i], x[fik->i], temp);
+        }
       }
-      else
-      {  /* solve the system F'*x = b */
-         for (i = n; i >= 1; i--)
-         {  k = P_row[i];
-            if (mpq_sgn(x[k]) != 0)
-            {  for (fkj = F_row[k]; fkj != NULL; fkj = fkj->r_next)
-               {  mpq_mul(temp, fkj->val, x[k]);
-                  mpq_sub(x[fkj->j], x[fkj->j], temp);
-               }
-            }
-         }
+    }
+  } else { /* solve the system F'*x = b */
+    for (i = n; i >= 1; i--) {
+      k = P_row[i];
+      if (mpq_sgn(x[k]) != 0) {
+        for (fkj = F_row[k]; fkj != NULL; fkj = fkj->r_next) {
+          mpq_mul(temp, fkj->val, x[k]);
+          mpq_sub(x[fkj->j], x[fkj->j], temp);
+        }
       }
-      mpq_clear(temp);
-      return;
+    }
+  }
+  mpq_clear(temp);
+  return;
 }
 
 /***********************************************************************
@@ -904,52 +901,50 @@ void lux_f_solve(LUX *lux, int tr, mpq_t x[])
 *  matrix V. On exit this array will contain elements of the solution
 *  vector x in the same locations. */
 
-void lux_v_solve(LUX *lux, int tr, mpq_t x[])
-{     int n = lux->n;
-      mpq_t *V_piv = lux->V_piv;
-      LUXELM **V_row = lux->V_row;
-      LUXELM **V_col = lux->V_col;
-      int *P_row = lux->P_row;
-      int *Q_col = lux->Q_col;
-      LUXELM *vij;
-      int i, j, k;
-      mpq_t *b, temp;
-      b = xcalloc(1+n, sizeof(mpq_t));
-      for (k = 1; k <= n; k++)
-         mpq_init(b[k]), mpq_set(b[k], x[k]), mpq_set_si(x[k], 0, 1);
-      mpq_init(temp);
-      if (!tr)
-      {  /* solve the system V*x = b */
-         for (k = n; k >= 1; k--)
-         {  i = P_row[k], j = Q_col[k];
-            if (mpq_sgn(b[i]) != 0)
-            {  mpq_set(x[j], b[i]);
-               mpq_div(x[j], x[j], V_piv[i]);
-               for (vij = V_col[j]; vij != NULL; vij = vij->c_next)
-               {  mpq_mul(temp, vij->val, x[j]);
-                  mpq_sub(b[vij->i], b[vij->i], temp);
-               }
-            }
-         }
+void lux_v_solve(const LUX *lux, int tr, mpq_t x[]) {
+  int n = lux->n;
+  mpq_t *V_piv = lux->V_piv;
+  LUXELM **V_row = lux->V_row;
+  LUXELM **V_col = lux->V_col;
+  int *P_row = lux->P_row;
+  int *Q_col = lux->Q_col;
+  LUXELM *vij;
+  int i, j, k;
+  mpq_t *b, temp;
+  b = xcalloc(1 + n, sizeof(mpq_t));
+  for (k = 1; k <= n; k++)
+    mpq_init(b[k]), mpq_set(b[k], x[k]), mpq_set_si(x[k], 0, 1);
+  mpq_init(temp);
+  if (!tr) { /* solve the system V*x = b */
+    for (k = n; k >= 1; k--) {
+      i = P_row[k], j = Q_col[k];
+      if (mpq_sgn(b[i]) != 0) {
+        mpq_set(x[j], b[i]);
+        mpq_div(x[j], x[j], V_piv[i]);
+        for (vij = V_col[j]; vij != NULL; vij = vij->c_next) {
+          mpq_mul(temp, vij->val, x[j]);
+          mpq_sub(b[vij->i], b[vij->i], temp);
+        }
       }
-      else
-      {  /* solve the system V'*x = b */
-         for (k = 1; k <= n; k++)
-         {  i = P_row[k], j = Q_col[k];
-            if (mpq_sgn(b[j]) != 0)
-            {  mpq_set(x[i], b[j]);
-               mpq_div(x[i], x[i], V_piv[i]);
-               for (vij = V_row[i]; vij != NULL; vij = vij->r_next)
-               {  mpq_mul(temp, vij->val, x[i]);
-                  mpq_sub(b[vij->j], b[vij->j], temp);
-               }
-            }
-         }
+    }
+  } else { /* solve the system V'*x = b */
+    for (k = 1; k <= n; k++) {
+      i = P_row[k], j = Q_col[k];
+      if (mpq_sgn(b[j]) != 0) {
+        mpq_set(x[i], b[j]);
+        mpq_div(x[i], x[i], V_piv[i]);
+        for (vij = V_row[i]; vij != NULL; vij = vij->r_next) {
+          mpq_mul(temp, vij->val, x[i]);
+          mpq_sub(b[vij->j], b[vij->j], temp);
+        }
       }
-      for (k = 1; k <= n; k++) mpq_clear(b[k]);
-      mpq_clear(temp);
-      xfree(b);
-      return;
+    }
+  }
+  for (k = 1; k <= n; k++)
+    mpq_clear(b[k]);
+  mpq_clear(temp);
+  xfree(b);
+  return;
 }
 
 /***********************************************************************
