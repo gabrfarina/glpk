@@ -28,6 +28,10 @@
 #include "dmp.h"
 #include "mygmp.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /***********************************************************************
 *  The structure LUX defines LU-factorization of a square matrix A,
 *  which is the following quartet:
@@ -200,20 +204,24 @@ int lux_decomp(LUX *lux, int (*col)(void *info, int j, int ind[],
 /* compute LU-factorization */
 
 #define lux_f_solve _glp_lux_f_solve
-void lux_f_solve(LUX *lux, int tr, mpq_t x[]);
+void lux_f_solve(const LUX *lux, int tr, mpq_t x[]);
 /* solve system F*x = b or F'*x = b */
 
 #define lux_v_solve _glp_lux_v_solve
-void lux_v_solve(LUX *lux, int tr, mpq_t x[]);
+void lux_v_solve(const LUX *lux, int tr, mpq_t x[]);
 /* solve system V*x = b or V'*x = b */
 
 #define lux_solve _glp_lux_solve
-void lux_solve(LUX *lux, int tr, mpq_t x[]);
+void lux_solve(const LUX *lux, int tr, mpq_t x[]);
 /* solve system A*x = b or A'*x = b */
 
 #define lux_delete _glp_lux_delete
 void lux_delete(LUX *lux);
 /* delete LU-factorization */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

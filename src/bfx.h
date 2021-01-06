@@ -34,7 +34,7 @@ BFX *bfx_create_binv(void);
 /* create factorization of the basis matrix */
 
 #define bfx_is_valid _glp_bfx_is_valid
-int bfx_is_valid(BFX *binv);
+int bfx_is_valid(const BFX *binv);
 /* check if factorization is valid */
 
 #define bfx_invalidate _glp_bfx_invalidate
@@ -47,11 +47,11 @@ int bfx_factorize(BFX *binv, int m, int (*col)(void *info, int j,
 /* compute factorization of the basis matrix */
 
 #define bfx_ftran _glp_bfx_ftran
-void bfx_ftran(BFX *binv, mpq_t x[], int save);
+void bfx_ftran(const BFX *binv, mpq_t x[], int save);
 /* perform forward transformation (FTRAN) */
 
 #define bfx_btran _glp_bfx_btran
-void bfx_btran(BFX *binv, mpq_t x[]);
+void bfx_btran(const BFX *binv, mpq_t x[]);
 /* perform backward transformation (BTRAN) */
 
 #define bfx_update _glp_bfx_update
